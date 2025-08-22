@@ -1,6 +1,6 @@
-# Trello Clone
+# Task Board
 
-A Trello clone built with React and Vite.
+A task board built with React and Vite - inspired by Trello.
 
 **Prerequisites**
 - Node.js 22

@@ -1,5 +1,6 @@
 {
-  "name": "trello-clone",
+  "name": "task-board",
+  "description": "A React practice project building a task board inspired by Trello",
   "private": true,
   "version": "0.0.0",
   "type": "module",
