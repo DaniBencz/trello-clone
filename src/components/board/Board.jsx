@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Board = () => {
+const Board = () => {
   const [count, setCount] = useState(0);
   const navigate = useNavigate();
 
@@ -32,3 +32,5 @@ export const Board = () => {
     </div>
   );
 };
+
+export default Board;

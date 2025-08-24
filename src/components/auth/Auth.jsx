@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Auth = () => {
+const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -79,3 +79,5 @@ export const Auth = () => {
     </div>
   );
 };
+
+export default Auth;

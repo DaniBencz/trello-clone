@@ -1,35 +1,24 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Auth } from "./components/auth/Auth";
-import { Board } from "./components/board/Board";
-
-const ProtectedRoute = ({ children }) => {
-  // TODO: import from service layer
-  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-};
+import { Routes, Route } from "react-router-dom";
+import Auth from "./components/auth/Auth";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Board from "./components/board/Board";
+import AppLayout from "./components/layout/Layout";
 
 function App() {
   return (
-    <div className="app-container">
-      <main className="app-content">
-        <Routes>
-          <Route path="/" element={<Auth />} />
-          <Route
-            path="/board"
-            element={
-              <ProtectedRoute>
-                <Board />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    <AppLayout>
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route
+          path="/board"
+          element={
+            <ProtectedRoute>
+              <Board />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AppLayout>
   );
 }
 
