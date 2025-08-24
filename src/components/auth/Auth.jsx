@@ -7,14 +7,17 @@ const Auth = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const validUsername = import.meta.env.VITE_AUTH_USERNAME;
+  const validPassword = import.meta.env.VITE_AUTH_PASSWORD;
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username === "user" && password === "secret") {
+    if (username === validUsername && password === validPassword) {
       // TODO: import from service layer
       localStorage.setItem("isAuthenticated", "true");
       navigate("/board");
     } else {
-      setError("Invalid credentials. Try user/secret");
+      setError(`Invalid credentials. Try ${validUsername}/${validPassword}`);
     }
   };
 
