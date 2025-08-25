@@ -1,9 +1,18 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { checkAuth } from "../../services/authService";
 
-// To keep it simple. For prod I'd use Context API or similar
 const ProtectedRoute = ({ children }) => {
-  // TODO: import from service layer
-  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    checkAuth().then(setIsAuthenticated);
+  }, []);
+
+  if (isAuthenticated === null) {
+    // TODO: loading spinner
+    return null;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

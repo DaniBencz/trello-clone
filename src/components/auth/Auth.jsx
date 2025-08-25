@@ -1,23 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../services/authService";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const validUsername = import.meta.env.VITE_AUTH_USERNAME;
-  const validPassword = import.meta.env.VITE_AUTH_PASSWORD;
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === validUsername && password === validPassword) {
-      // TODO: import from service layer
-      localStorage.setItem("isAuthenticated", "true");
+    setError("");
+    setLoading(true);
+
+    try {
+      await login(username, password);
       navigate("/board");
-    } else {
-      setError(`Invalid credentials. Try ${validUsername}/${validPassword}`);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,6 +30,12 @@ const Auth = () => {
         <h1 className="text-2xl font-bold text-center text-gray-900">
           Login to Task Board
         </h1>
+
+        {loading && (
+          <div className="flex justify-center my-4">
+            <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 text-sm text-red-500 bg-red-100 rounded">

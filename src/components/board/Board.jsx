@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../../services/authService";
 
 const Board = () => {
   const [count, setCount] = useState(0);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // TODO: import from service layer
-    localStorage.removeItem("isAuthenticated");
+  const handleLogout = async () => {
+    await logout();
+    // TODO: loading spinner
     navigate("/");
   };
 
