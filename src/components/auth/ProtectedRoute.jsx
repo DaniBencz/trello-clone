@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { checkAuth } from "../../services/authService";
+import Spinner from "../common/Spinner";
+import { AuthContext } from "../../context/authContext";
 
 const ProtectedRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const { isAuthenticated } = useContext(AuthContext);
 
-  useEffect(() => {
-    checkAuth().then(setIsAuthenticated);
-  }, []);
-
-  if (isAuthenticated === null) {
-    // TODO: loading spinner
-    return null;
+  if (isAuthenticated === undefined) {
+    return <Spinner />;
   }
 
   if (!isAuthenticated) {

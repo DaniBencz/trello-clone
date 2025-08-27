@@ -1,10 +1,11 @@
-// mock async API call
 export function login(username, password) {
   const validUsername = import.meta.env.VITE_AUTH_USERNAME;
   const validPassword = import.meta.env.VITE_AUTH_PASSWORD;
 
   if (username === validUsername && password === validPassword) {
-    document.cookie = "isAuthenticated=true; path=/";
+    document.cookie = "auth=true; path=/";
+
+    // mock async API call
     return new Promise((resolve) => {
       setTimeout(resolve, 500);
     });
@@ -14,17 +15,17 @@ export function login(username, password) {
   }
 }
 
-// mock async API call
 export function checkAuth() {
+  // mock async API call
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(document.cookie.includes("isAuthenticated=true"));
+      resolve(document.cookie.includes("auth=true"));
     }, 500);
   });
 }
 
 export function logout() {
-  document.cookie = "isAuthenticated=false; path=/";
+  document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   return new Promise((resolve) => {
     setTimeout(resolve, 500);
   });

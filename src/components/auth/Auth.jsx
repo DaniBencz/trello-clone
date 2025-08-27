@@ -1,26 +1,31 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services/authService";
+import { AuthContext } from "../../context/authContext";
+import Spinner from "../common/Spinner";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { login, loading, error, isAuthenticated } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/board");
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isAuthenticated === undefined) {
+    return <Spinner />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    await login(username, password);
 
-    try {
-      await login(username, password);
+    if (isAuthenticated) {
       navigate("/board");
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -31,11 +36,7 @@ const Auth = () => {
           Login to Task Board
         </h1>
 
-        {loading && (
-          <div className="flex justify-center my-4">
-            <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
+        {loading && <Spinner />}
 
         {error && (
           <div className="p-3 text-sm text-red-500 bg-red-100 rounded">

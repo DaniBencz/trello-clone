@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../services/authService";
+import { AuthContext } from "../../context/authContext";
 
 const Board = () => {
   const [count, setCount] = useState(0);
   const navigate = useNavigate();
+
+  const { logout } = useContext(AuthContext);
 
   const handleLogout = async () => {
     await logout();
