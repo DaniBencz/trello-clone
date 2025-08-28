@@ -59,6 +59,7 @@ const Auth = () => {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
               required
+              autoComplete="username"
             />
           </div>
 
@@ -82,7 +83,7 @@ const Auth = () => {
           <div>
             <button
               type="submit"
-              className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+              className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 hover:cursor-pointer"
             >
               Sign in
             </button>

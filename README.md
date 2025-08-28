@@ -2,6 +2,8 @@
 
 A task board built with React and Vite - inspired by Trello.
 
+**Try it at** [task-board-poc.surge.sh](https://task-board-poc.surge.sh/)
+
 **Prerequisites**
 - Node.js 22
 
