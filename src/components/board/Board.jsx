@@ -19,7 +19,7 @@ const Board = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-400 w-[80vw]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Task Board</h1>
         <button
@@ -35,6 +35,8 @@ const Board = () => {
         {/* ToDo */}
         <div className="flex-1 bg-white rounded p-4 shadow">
           <h2 className="font-semibold mb-4 text-gray-800">ToDo</h2>
+          <Task />
+          <Task />
           <Task />
         </div>
         {/* In Progress */}

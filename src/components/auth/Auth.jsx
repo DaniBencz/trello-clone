@@ -57,7 +57,7 @@ const Auth = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
               required
               autoComplete="username"
             />
@@ -75,7 +75,7 @@ const Auth = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
               required
             />
           </div>
