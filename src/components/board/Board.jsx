@@ -1,16 +1,24 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 
 const Task = () => (
   <div className="bg-gray-100 p-4 rounded shadow mb-2">
-    <p className="text-gray-800">A Task</p>
+    <p className="text-gray-800">Task Name</p>
+    <p className="text-gray-800">Task Description</p>
   </div>
 );
 
 const Board = () => {
-  const navigate = useNavigate();
+  const [toDoTasks, setToDoTasks] = useState([]);
+  const addTodoTask = () => {
+    setToDoTasks((prevItems) => [
+      ...prevItems,
+      { name: "New Task", description: "Task Description" },
+    ]);
+  };
 
+  const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
 
   const handleLogout = async () => {
@@ -23,8 +31,14 @@ const Board = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Task Board</h1>
         <button
+          onClick={addTodoTask}
+          className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 hover:cursor-pointer"
+        >
+          Add Task
+        </button>
+        <button
           onClick={handleLogout}
-          className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 hover:cursor-pointer"
+          className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700 hover:cursor-pointer"
         >
           Logout
         </button>
@@ -35,9 +49,9 @@ const Board = () => {
         {/* ToDo */}
         <div className="flex-1 bg-white rounded p-4 shadow">
           <h2 className="font-semibold mb-4 text-gray-800">ToDo</h2>
-          <Task />
-          <Task />
-          <Task />
+          {toDoTasks.map((task, index) => (
+            <Task key={index} name={task.name} description={task.description} />
+          ))}
         </div>
         {/* In Progress */}
         <div className="flex-1 bg-white rounded p-4 shadow">
