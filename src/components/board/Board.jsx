@@ -6,6 +6,8 @@ import BoardColumn from "./BoardColumn";
 
 const Board = () => {
   const [toDoTasks, setToDoTasks] = useState([]);
+  const [inProgressTasks, setInProgressTasks] = useState([]);
+  const [doneTasks, setDoneTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -20,7 +22,12 @@ const Board = () => {
 
     setToDoTasks((prevItems) => [
       ...prevItems,
-      { name: taskName, description: taskDescription },
+      {
+        id: Date.now(),
+        name: taskName,
+        description: taskDescription,
+        status: 0,
+      },
     ]);
 
     setTaskName("");
@@ -40,6 +47,16 @@ const Board = () => {
     setShowForm(false);
     setTaskName("");
     setTaskDescription("");
+  };
+
+  const deleteTask = (id) => {
+    setToDoTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+
+    setInProgressTasks((prevTasks) =>
+      prevTasks.filter((task) => task.id !== id)
+    );
+
+    setDoneTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
   };
 
   return (
@@ -65,11 +82,18 @@ const Board = () => {
           </button>
         </div>
 
-        {/* Columns */}
         <div className="flex gap-4">
-          <BoardColumn title="To Do" tasks={toDoTasks} />
-          <BoardColumn title="In Progress" tasks={[]} />
-          <BoardColumn title="Done" tasks={[]} />
+          <BoardColumn
+            title="To Do"
+            tasks={toDoTasks}
+            deleteTask={deleteTask}
+          />
+          <BoardColumn
+            title="In Progress"
+            tasks={inProgressTasks}
+            deleteTask={deleteTask}
+          />
+          <BoardColumn title="Done" tasks={doneTasks} deleteTask={deleteTask} />
         </div>
       </div>
 
