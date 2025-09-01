@@ -1,3 +1,5 @@
+// mock async API calls to simulate authentication via Backend
+
 export function login(username, password) {
   const validUsername = import.meta.env.VITE_AUTH_USERNAME;
   const validPassword = import.meta.env.VITE_AUTH_PASSWORD;
@@ -5,7 +7,6 @@ export function login(username, password) {
   if (username === validUsername && password === validPassword) {
     document.cookie = "auth=true; path=/";
 
-    // mock async API call
     return new Promise((resolve) => {
       setTimeout(resolve, 500);
     });
@@ -16,7 +17,6 @@ export function login(username, password) {
 }
 
 export function checkAuth() {
-  // mock async API call
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(document.cookie.includes("auth=true"));

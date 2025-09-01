@@ -1,6 +1,11 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
+import {
+  createTask,
+  getTasks,
+  deleteTask,
+} from "../../services/taskService";
 import AddTask from "./AddTask";
 import BoardColumn from "./BoardColumn";
 
@@ -12,23 +17,34 @@ const Board = () => {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
 
+  useEffect(() => {
+    // TODO add loading state
+    const loadTasks = async () => {
+      const tasks = await getTasks();
+      setToDoTasks(tasks.filter((task) => task.status === 0));
+      setInProgressTasks(tasks.filter((task) => task.status === 1));
+      setDoneTasks(tasks.filter((task) => task.status === 2));
+    };
+    loadTasks();
+  }, []);
+
   const addTodoTask = () => {
     setShowForm(true);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (taskName.trim() === "") return;
 
-    setToDoTasks((prevItems) => [
-      ...prevItems,
-      {
-        id: Date.now(),
-        name: taskName,
-        description: taskDescription,
-        status: 0,
-      },
-    ]);
+    const newTask = {
+      id: Date.now(),
+      name: taskName,
+      description: taskDescription,
+      status: 0,
+    };
+
+    setToDoTasks((prevItems) => [...prevItems, newTask]);
+    await createTask(newTask);
 
     setTaskName("");
     setTaskDescription("");
@@ -49,14 +65,12 @@ const Board = () => {
     setTaskDescription("");
   };
 
-  const deleteTask = (id) => {
+  const removeTask = async (id) => {
     setToDoTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-
-    setInProgressTasks((prevTasks) =>
-      prevTasks.filter((task) => task.id !== id)
-    );
-
+    setInProgressTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
     setDoneTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+
+    await deleteTask(id);
   };
 
   return (
@@ -86,14 +100,14 @@ const Board = () => {
           <BoardColumn
             title="To Do"
             tasks={toDoTasks}
-            deleteTask={deleteTask}
+            deleteTask={removeTask}
           />
           <BoardColumn
             title="In Progress"
             tasks={inProgressTasks}
-            deleteTask={deleteTask}
+            deleteTask={removeTask}
           />
-          <BoardColumn title="Done" tasks={doneTasks} deleteTask={deleteTask} />
+          <BoardColumn title="Done" tasks={doneTasks} deleteTask={removeTask} />
         </div>
       </div>
 
