@@ -1,11 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import {
-  createTask,
-  getTasks,
-  deleteTask,
-} from "../../services/taskService";
+import { createTask, getTasks, deleteTask } from "../../services/taskService";
 import AddTask from "./AddTask";
 import BoardColumn from "./BoardColumn";
 
@@ -43,8 +39,19 @@ const Board = () => {
       status: 0,
     };
 
+    // Optimistic update
     setToDoTasks((prevItems) => [...prevItems, newTask]);
-    await createTask(newTask);
+
+    try {
+      await createTask(newTask);
+    } catch {
+      // Rollback on failure
+      setToDoTasks((prevItems) =>
+        prevItems.filter((task) => task.id !== newTask.id)
+      );
+      alert("Failed to create task. Please try again.");
+      return; // Keep the form open
+    }
 
     setTaskName("");
     setTaskDescription("");
@@ -66,11 +73,34 @@ const Board = () => {
   };
 
   const removeTask = async (id) => {
+    // Store the task before removing (for potential rollback)
+    const taskToDelete = [...toDoTasks, ...inProgressTasks, ...doneTasks].find(
+      (task) => task.id === id
+    );
+
+    // Optimistic update
     setToDoTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-    setInProgressTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    setInProgressTasks((prevTasks) =>
+      prevTasks.filter((task) => task.id !== id)
+    );
     setDoneTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
 
-    await deleteTask(id);
+    try {
+      await deleteTask(id);
+    } catch {
+      // Rollback - restore the task to its original column
+      if (taskToDelete) {
+        if (taskToDelete.status === 0) {
+          setToDoTasks((prev) => [...prev, taskToDelete]);
+        } else if (taskToDelete.status === 1) {
+          setInProgressTasks((prev) => [...prev, taskToDelete]);
+        } else if (taskToDelete.status === 2) {
+          setDoneTasks((prev) => [...prev, taskToDelete]);
+        }
+      }
+
+      alert("Failed to delete task. Please try again.");
+    }
   };
 
   return (

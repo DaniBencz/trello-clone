@@ -34,6 +34,11 @@ export const deleteTask = async (taskId) => {
 };
 
 const saveTasks = (tasks) => {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  return new Promise((resolve) => setTimeout(resolve, 300));
+  // return Promise.reject(); // Simulate error to test Rollback strategy
+  return new Promise((resolve) =>
+    setTimeout(() => {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      resolve();
+    }, 300)
+  );
 };

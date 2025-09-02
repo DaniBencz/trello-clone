@@ -7,9 +7,7 @@ const BoardColumn = ({ title, tasks, deleteTask }) => {
       {tasks.map((task) => (
         <Task
           key={task.id}
-          id={task.id}
-          name={task.name}
-          description={task.description}
+          task={task}
           deleteTask={deleteTask}
         />
       ))}
