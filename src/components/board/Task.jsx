@@ -6,6 +6,19 @@ const Task = ({ task, deleteTask }) => (
     >
       Delete
     </button>
+
+    {task.status > 0 && (
+      <button className="mt-2 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 hover:cursor-pointer">
+        {`${"<"}`}
+      </button>
+    )}
+
+    {task.status < 2 && (
+      <button className="mt-2 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 hover:cursor-pointer">
+        {`${">"}`}
+      </button>
+    )}
+
     <p className="text-gray-800">{task.name}</p>
     <p className="text-gray-800">{task.description}</p>
   </div>
