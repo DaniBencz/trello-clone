@@ -1,14 +1,22 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import { createTask, getTasks, deleteTask } from "../../services/taskService";
+import {
+  getTasks,
+  patchTask,
+  postTask,
+  deleteTask,
+} from "../../services/taskService";
 import AddTask from "./AddTask";
 import BoardColumn from "./BoardColumn";
 
+function log(message) {
+  // mock logging to monitoring tool, e.g., Sentry, LogRocket
+  console.log(`[Board] ${message}`);
+}
+
 const Board = () => {
-  const [toDoTasks, setToDoTasks] = useState([]);
-  const [inProgressTasks, setInProgressTasks] = useState([]);
-  const [doneTasks, setDoneTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -16,10 +24,13 @@ const Board = () => {
   useEffect(() => {
     // TODO add loading state
     const loadTasks = async () => {
-      const tasks = await getTasks();
-      setToDoTasks(tasks.filter((task) => task.status === 0));
-      setInProgressTasks(tasks.filter((task) => task.status === 1));
-      setDoneTasks(tasks.filter((task) => task.status === 2));
+      try {
+        const items = await getTasks();
+        setTasks(items);
+      } catch (error) {
+        log(error);
+        alert("Failed to load tasks. Please try again.");
+      }
     };
     loadTasks();
   }, []);
@@ -40,15 +51,16 @@ const Board = () => {
     };
 
     // Optimistic update
-    setToDoTasks((prevItems) => [...prevItems, newTask]);
+    setTasks((prevItems) => [...prevItems, newTask]);
 
     try {
-      await createTask(newTask);
-    } catch {
+      await postTask(newTask);
+    } catch (error) {
       // Rollback on failure
-      setToDoTasks((prevItems) =>
+      setTasks((prevItems) =>
         prevItems.filter((task) => task.id !== newTask.id)
       );
+      log(error);
       alert("Failed to create task. Please try again.");
       return; // Keep the form open
     }
@@ -74,32 +86,38 @@ const Board = () => {
 
   const removeTask = async (id) => {
     // Store the task before removing (for potential rollback)
-    const taskToDelete = [...toDoTasks, ...inProgressTasks, ...doneTasks].find(
-      (task) => task.id === id
-    );
+    const taskToDelete = tasks.find((task) => task.id === id);
 
     // Optimistic update
-    setToDoTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-    setInProgressTasks((prevTasks) =>
-      prevTasks.filter((task) => task.id !== id)
-    );
-    setDoneTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
 
     try {
       await deleteTask(id);
-    } catch {
+    } catch (error) {
       // Rollback - restore the task to its original column
       if (taskToDelete) {
-        if (taskToDelete.status === 0) {
-          setToDoTasks((prev) => [...prev, taskToDelete]);
-        } else if (taskToDelete.status === 1) {
-          setInProgressTasks((prev) => [...prev, taskToDelete]);
-        } else if (taskToDelete.status === 2) {
-          setDoneTasks((prev) => [...prev, taskToDelete]);
-        }
+        setTasks((prev) => [...prev, taskToDelete]);
       }
-
+      log(error);
       alert("Failed to delete task. Please try again.");
+    }
+  };
+
+  const updateTask = async (updatedTask) => {
+    // Optimistic update
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+
+    try {
+      await patchTask(updatedTask);
+    } catch (error) {
+      // Rollback on failure
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task.id === updatedTask.id ? task : task))
+      );
+      log(error);
+      alert("Failed to update task. Please try again.");
     }
   };
 
@@ -129,15 +147,22 @@ const Board = () => {
         <div className="flex gap-4">
           <BoardColumn
             title="To Do"
-            tasks={toDoTasks}
+            tasks={tasks.filter((task) => task.status === 0)}
             deleteTask={removeTask}
+            updateTask={updateTask}
           />
           <BoardColumn
             title="In Progress"
-            tasks={inProgressTasks}
+            tasks={tasks.filter((task) => task.status === 1)}
             deleteTask={removeTask}
+            updateTask={updateTask}
           />
-          <BoardColumn title="Done" tasks={doneTasks} deleteTask={removeTask} />
+          <BoardColumn
+            title="Done"
+            tasks={tasks.filter((task) => task.status === 2)}
+            deleteTask={removeTask}
+            updateTask={updateTask}
+          />
         </div>
       </div>
 

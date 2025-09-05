@@ -29,6 +29,9 @@ const Auth = () => {
     }
   };
 
+  const usernamePlaceholder = import.meta.env.VITE_AUTH_USERNAME;
+  const passwordPlaceholder = import.meta.env.VITE_AUTH_PASSWORD;
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
@@ -60,6 +63,7 @@ const Auth = () => {
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
               required
               autoComplete="username"
+              placeholder={usernamePlaceholder}
             />
           </div>
 
@@ -77,6 +81,7 @@ const Auth = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
               required
+              placeholder={passwordPlaceholder}
             />
           </div>
 

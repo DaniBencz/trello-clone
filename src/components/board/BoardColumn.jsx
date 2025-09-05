@@ -1,6 +1,6 @@
 import Task from "./Task";
 
-const BoardColumn = ({ title, tasks, deleteTask }) => {
+const BoardColumn = ({ title, tasks, deleteTask, updateTask }) => {
   return (
     <div className="flex-1 bg-white rounded p-4 shadow">
       <h2 className="font-semibold mb-4 text-gray-800">{title}</h2>
@@ -9,6 +9,7 @@ const BoardColumn = ({ title, tasks, deleteTask }) => {
           key={task.id}
           task={task}
           deleteTask={deleteTask}
+          updateTask={updateTask}
         />
       ))}
     </div>

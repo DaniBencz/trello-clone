@@ -1,7 +1,7 @@
 // mock async API calls to simulate CRUD server interactions
 // TODO: error handling
 
-export const createTask = async (task) => {
+export const postTask = async (task) => {
   const tasks = await getTasks();
   tasks.push(task);
   await saveTasks(tasks);
@@ -17,12 +17,12 @@ export const getTasks = () => {
   });
 };
 
-export const updateTask = async (updatedTask) => {
+export const patchTask = async (updatedTask) => {
   const tasks = await getTasks();
   const taskIndex = tasks.findIndex((task) => task.id === updatedTask.id);
 
   if (taskIndex !== -1) {
-    tasks[taskIndex] = updatedTask;
+    tasks[taskIndex] = { ...tasks[taskIndex], ...updatedTask };
     await saveTasks(tasks);
   }
 };
