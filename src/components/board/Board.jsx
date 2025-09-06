@@ -8,8 +8,10 @@ import {
   deleteTask,
 } from "../../services/taskService";
 import AddTask from "./AddTask";
+import EditTask from "./EditTask";
 import BoardColumn from "./BoardColumn";
 
+// TODO: move to service layer
 function log(message) {
   // mock logging to monitoring tool, e.g., Sentry, LogRocket
   console.log(`[Board] ${message}`);
@@ -17,7 +19,9 @@ function log(message) {
 
 const Board = () => {
   const [tasks, setTasks] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [showEditTask, setShowEditTask] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
 
@@ -35,11 +39,38 @@ const Board = () => {
     loadTasks();
   }, []);
 
-  const addTodoTask = () => {
-    setShowForm(true);
+  const openAddTask = () => {
+    setShowAddTask(true);
   };
 
-  const handleFormSubmit = async (e) => {
+  const openEditTask = (taskId) => {
+    setEditingTaskId(taskId);
+    // TODO: pass entire task object
+    const task = tasks.find((task) => task.id === taskId);
+    if (task) {
+      setTaskName(task.name);
+      setTaskDescription(task.description);
+    }
+    setShowEditTask(true);
+  };
+
+  const submitEditTask = async (e) => {
+    e.preventDefault();
+    if (taskName.trim() === "") return;
+
+    await updateTask({
+      ...tasks.find((task) => task.id === editingTaskId),
+      name: taskName,
+      description: taskDescription,
+    });
+
+    setTaskName("");
+    setTaskDescription("");
+    setEditingTaskId(null);
+    setShowEditTask(false);
+  };
+
+  const submitNewTask = async (e) => {
     e.preventDefault();
     if (taskName.trim() === "") return;
 
@@ -67,7 +98,7 @@ const Board = () => {
 
     setTaskName("");
     setTaskDescription("");
-    setShowForm(false);
+    setShowAddTask(false);
   };
 
   const navigate = useNavigate();
@@ -78,8 +109,11 @@ const Board = () => {
     navigate("/");
   };
 
+  // TODO: call on 'Escape' key press
   const closeModal = () => {
-    setShowForm(false);
+    setShowAddTask(false);
+    setShowEditTask(false);
+    setEditingTaskId(null);
     setTaskName("");
     setTaskDescription("");
   };
@@ -125,13 +159,13 @@ const Board = () => {
     <>
       <div
         className={`p-6 bg-gray-400 w-[80vw] max-w-3xl rounded-lg ${
-          showForm ? "blur-sm" : ""
+          showAddTask || showEditTask ? "blur-sm" : ""
         }`}
       >
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Task Board</h1>
           <button
-            onClick={addTodoTask}
+            onClick={openAddTask}
             className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 hover:cursor-pointer"
           >
             Add Task
@@ -150,26 +184,39 @@ const Board = () => {
             tasks={tasks.filter((task) => task.status === 0)}
             deleteTask={removeTask}
             updateTask={updateTask}
+            openForm={openEditTask}
           />
           <BoardColumn
             title="In Progress"
             tasks={tasks.filter((task) => task.status === 1)}
             deleteTask={removeTask}
             updateTask={updateTask}
+            openForm={openEditTask}
           />
           <BoardColumn
             title="Done"
             tasks={tasks.filter((task) => task.status === 2)}
             deleteTask={removeTask}
             updateTask={updateTask}
+            openForm={openEditTask}
           />
         </div>
       </div>
 
-      {showForm && (
+      {showAddTask && (
         <AddTask
           closeModal={closeModal}
-          handleFormSubmit={handleFormSubmit}
+          handleFormSubmit={submitNewTask}
+          taskName={taskName}
+          setTaskName={setTaskName}
+          taskDescription={taskDescription}
+          setTaskDescription={setTaskDescription}
+        />
+      )}
+      {showEditTask && (
+        <EditTask
+          closeModal={closeModal}
+          handleFormSubmit={submitEditTask}
           taskName={taskName}
           setTaskName={setTaskName}
           taskDescription={taskDescription}
