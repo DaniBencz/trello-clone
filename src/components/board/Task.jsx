@@ -28,13 +28,13 @@ const Task = ({ task, deleteTask, updateTask, openForm }) => {
         <div>
           <button
             className="px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 hover:cursor-pointer"
-            onClick={() => openForm(task.id)}
+            onClick={() => openForm(task)}
           >
             Edit
           </button>
           <button
-            onClick={() => deleteTask(task.id)}
             className="px-2 py-1 ml-1 text-white bg-red-500 rounded hover:bg-red-700 hover:cursor-pointer"
+            onClick={() => deleteTask(task.id)}
           >
             x
           </button>

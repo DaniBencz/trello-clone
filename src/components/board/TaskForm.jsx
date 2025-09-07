@@ -1,16 +1,17 @@
-// TODO: merge this with AddTask component
-const EditTask = ({
+const TaskForm = ({
+  title,
+  action = "Save",
   closeModal,
   handleFormSubmit,
   taskName,
-  taskDescription,
   setTaskName,
+  taskDescription,
   setTaskDescription,
 }) => {
   return (
     <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-md mx-4">
-        <h2 className="text-xl font-bold mb-4">Edit Task</h2>
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
           <input
             type="text"
@@ -39,7 +40,7 @@ const EditTask = ({
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 hover:cursor-pointer"
             >
-              Save
+              {action}
             </button>
           </div>
         </form>
@@ -48,4 +49,4 @@ const EditTask = ({
   );
 };
 
-export default EditTask;
+export default TaskForm;

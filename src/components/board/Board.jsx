@@ -7,15 +7,9 @@ import {
   postTask,
   deleteTask,
 } from "../../services/taskService";
-import AddTask from "./AddTask";
-import EditTask from "./EditTask";
+import TaskForm from "./TaskForm";
 import BoardColumn from "./BoardColumn";
-
-// TODO: move to service layer
-function log(message) {
-  // mock logging to monitoring tool, e.g., Sentry, LogRocket
-  console.log(`[Board] ${message}`);
-}
+import log from "../../services/logger";
 
 const Board = () => {
   const [tasks, setTasks] = useState([]);
@@ -43,14 +37,10 @@ const Board = () => {
     setShowAddTask(true);
   };
 
-  const openEditTask = (taskId) => {
-    setEditingTaskId(taskId);
-    // TODO: pass entire task object
-    const task = tasks.find((task) => task.id === taskId);
-    if (task) {
-      setTaskName(task.name);
-      setTaskDescription(task.description);
-    }
+  const openEditTask = (task) => {
+    setEditingTaskId(task.id);
+    setTaskName(task.name);
+    setTaskDescription(task.description);
     setShowEditTask(true);
   };
 
@@ -119,7 +109,7 @@ const Board = () => {
   };
 
   const removeTask = async (id) => {
-    // Store the task before removing (for potential rollback)
+    // Store the task before removing (for rollback)
     const taskToDelete = tasks.find((task) => task.id === id);
 
     // Optimistic update
@@ -138,6 +128,9 @@ const Board = () => {
   };
 
   const updateTask = async (updatedTask) => {
+    // Save the task before updating (for rollback)
+    const originalTask = tasks.find((task) => task.id === updatedTask.id);
+
     // Optimistic update
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
@@ -148,7 +141,9 @@ const Board = () => {
     } catch (error) {
       // Rollback on failure
       setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === updatedTask.id ? task : task))
+        prevTasks.map((task) =>
+          task.id === updatedTask.id ? originalTask : task
+        )
       );
       log(error);
       alert("Failed to update task. Please try again.");
@@ -204,7 +199,8 @@ const Board = () => {
       </div>
 
       {showAddTask && (
-        <AddTask
+        <TaskForm
+          title="Add New Task"
           closeModal={closeModal}
           handleFormSubmit={submitNewTask}
           taskName={taskName}
@@ -214,7 +210,8 @@ const Board = () => {
         />
       )}
       {showEditTask && (
-        <EditTask
+        <TaskForm
+          title="Edit Task"
           closeModal={closeModal}
           handleFormSubmit={submitEditTask}
           taskName={taskName}
