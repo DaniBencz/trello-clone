@@ -153,7 +153,7 @@ const Board = () => {
   return (
     <>
       <div
-        className={`p-6 bg-gray-400 w-[80vw] max-w-3xl rounded-lg ${
+        className={`p-6 bg-gray-400 w-[99vw] md:w-[80vw] md:max-w-6xl rounded-lg ${
           showAddTask || showEditTask ? "blur-sm" : ""
         }`}
       >
@@ -173,28 +173,41 @@ const Board = () => {
           </button>
         </div>
 
-        <div className="flex gap-4">
-          <BoardColumn
-            title="To Do"
-            tasks={tasks.filter((task) => task.status === 0)}
-            deleteTask={removeTask}
-            updateTask={updateTask}
-            openForm={openEditTask}
-          />
-          <BoardColumn
-            title="In Progress"
-            tasks={tasks.filter((task) => task.status === 1)}
-            deleteTask={removeTask}
-            updateTask={updateTask}
-            openForm={openEditTask}
-          />
-          <BoardColumn
-            title="Done"
-            tasks={tasks.filter((task) => task.status === 2)}
-            deleteTask={removeTask}
-            updateTask={updateTask}
-            openForm={openEditTask}
-          />
+        <div
+          className="
+            flex gap-4
+            md:gap-4
+            md:overflow-visible
+            overflow-x-auto
+            flex-nowrap
+            snap-x snap-mandatory
+            pb-4
+            -mx-4 px-4
+            scroll-smooth
+          "
+          aria-label="Task board columns"
+        >
+            <BoardColumn
+              title="To Do"
+              tasks={tasks.filter((task) => task.status === 0)}
+              deleteTask={removeTask}
+              updateTask={updateTask}
+              openForm={openEditTask}
+            />
+            <BoardColumn
+              title="In Progress"
+              tasks={tasks.filter((task) => task.status === 1)}
+              deleteTask={removeTask}
+              updateTask={updateTask}
+              openForm={openEditTask}
+            />
+            <BoardColumn
+              title="Done"
+              tasks={tasks.filter((task) => task.status === 2)}
+              deleteTask={removeTask}
+              updateTask={updateTask}
+              openForm={openEditTask}
+            />
         </div>
       </div>
 
