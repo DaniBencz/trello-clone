@@ -1,94 +1,54 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import {
-  getTasks,
-  patchTask,
-  postTask,
-  deleteTask,
-} from "../../services/taskService";
+  useTasks,
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+} from "../../hooks/useTasks";
 import TaskForm from "./TaskForm";
 import BoardColumn from "./BoardColumn";
-import log from "../../services/logger";
 
 const Board = () => {
-  const [tasks, setTasks] = useState([]);
+  const { data: tasks = [] } = useTasks();
+  const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+
   const [showAddTask, setShowAddTask] = useState(false);
   const [showEditTask, setShowEditTask] = useState(false);
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [taskName, setTaskName] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
+  const [editingTask, setEditingTask] = useState(null);
 
-  useEffect(() => {
-    // TODO add loading state
-    const loadTasks = async () => {
-      try {
-        const items = await getTasks();
-        setTasks(items);
-      } catch (error) {
-        log(error);
-        alert("Failed to load tasks. Please try again.");
-      }
-    };
-    loadTasks();
-  }, []);
-
-  const openAddTask = () => {
-    setShowAddTask(true);
-  };
+  const openAddTask = () => setShowAddTask(true);
 
   const openEditTask = (task) => {
-    setEditingTaskId(task.id);
-    setTaskName(task.name);
-    setTaskDescription(task.description);
+    setEditingTask(task);
     setShowEditTask(true);
   };
 
-  const submitEditTask = async (e) => {
-    e.preventDefault();
-    if (taskName.trim() === "") return;
-
-    await updateTask({
-      ...tasks.find((task) => task.id === editingTaskId),
-      name: taskName,
-      description: taskDescription,
-    });
-
-    setTaskName("");
-    setTaskDescription("");
-    setEditingTaskId(null);
+  const closeModal = () => {
+    setShowAddTask(false);
     setShowEditTask(false);
+    setEditingTask(null);
   };
 
-  const submitNewTask = async (e) => {
-    e.preventDefault();
-    if (taskName.trim() === "") return;
-
-    const newTask = {
+  const handleCreateTask = (taskData) => {
+    createTask.mutate({
+      ...taskData,
       id: Date.now(),
-      name: taskName,
-      description: taskDescription,
       status: 0,
-    };
+    });
+    closeModal();
+  };
 
-    // Optimistic update
-    setTasks((prevItems) => [...prevItems, newTask]);
+  const handleUpdateTask = (taskData) => {
+    updateTask.mutate({ ...editingTask, ...taskData });
+    closeModal();
+  };
 
-    try {
-      await postTask(newTask);
-    } catch (error) {
-      // Rollback on failure
-      setTasks((prevItems) =>
-        prevItems.filter((task) => task.id !== newTask.id)
-      );
-      log(error);
-      alert("Failed to create task. Please try again.");
-      return; // Keep the form open
-    }
-
-    setTaskName("");
-    setTaskDescription("");
-    setShowAddTask(false);
+  const handleDeleteTask = (id) => {
+    deleteTask.mutate(id);
   };
 
   const navigate = useNavigate();
@@ -97,57 +57,6 @@ const Board = () => {
   const handleLogout = async () => {
     await logout();
     navigate("/");
-  };
-
-  // TODO: call on 'Escape' key press
-  const closeModal = () => {
-    setShowAddTask(false);
-    setShowEditTask(false);
-    setEditingTaskId(null);
-    setTaskName("");
-    setTaskDescription("");
-  };
-
-  const removeTask = async (id) => {
-    // Store the task before removing (for rollback)
-    const taskToDelete = tasks.find((task) => task.id === id);
-
-    // Optimistic update
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-
-    try {
-      await deleteTask(id);
-    } catch (error) {
-      // Rollback - restore the task to its original column
-      if (taskToDelete) {
-        setTasks((prev) => [...prev, taskToDelete]);
-      }
-      log(error);
-      alert("Failed to delete task. Please try again.");
-    }
-  };
-
-  const updateTask = async (updatedTask) => {
-    // Save the task before updating (for rollback)
-    const originalTask = tasks.find((task) => task.id === updatedTask.id);
-
-    // Optimistic update
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
-    );
-
-    try {
-      await patchTask(updatedTask);
-    } catch (error) {
-      // Rollback on failure
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === updatedTask.id ? originalTask : task
-        )
-      );
-      log(error);
-      alert("Failed to update task. Please try again.");
-    }
   };
 
   return (
@@ -161,53 +70,43 @@ const Board = () => {
           <h1 className="text-2xl font-bold">Task Board</h1>
           <button
             onClick={openAddTask}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 hover:cursor-pointer"
+            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
           >
             Add Task
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700 hover:cursor-pointer"
+            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700"
           >
             Logout
           </button>
         </div>
 
         <div
-          className="
-            flex gap-4
-            md:gap-4
-            md:overflow-visible
-            overflow-x-auto
-            flex-nowrap
-            snap-x snap-mandatory
-            pb-4
-            -mx-4 px-4
-            scroll-smooth
-          "
+          className="flex gap-4 md:gap-4 md:overflow-visible overflow-x-auto flex-nowrap snap-x snap-mandatory pb-4 -mx-4 px-4 scroll-smooth"
           aria-label="Task board columns"
         >
-            <BoardColumn
-              title="To Do"
-              tasks={tasks.filter((task) => task.status === 0)}
-              deleteTask={removeTask}
-              updateTask={updateTask}
-              openForm={openEditTask}
-            />
-            <BoardColumn
-              title="In Progress"
-              tasks={tasks.filter((task) => task.status === 1)}
-              deleteTask={removeTask}
-              updateTask={updateTask}
-              openForm={openEditTask}
-            />
-            <BoardColumn
-              title="Done"
-              tasks={tasks.filter((task) => task.status === 2)}
-              deleteTask={removeTask}
-              updateTask={updateTask}
-              openForm={openEditTask}
-            />
+          <BoardColumn
+            title="To Do"
+            tasks={tasks.filter((task) => task.status === 0)}
+            deleteTask={handleDeleteTask}
+            updateTask={updateTask.mutate}
+            openForm={openEditTask}
+          />
+          <BoardColumn
+            title="In Progress"
+            tasks={tasks.filter((task) => task.status === 1)}
+            deleteTask={handleDeleteTask}
+            updateTask={updateTask.mutate}
+            openForm={openEditTask}
+          />
+          <BoardColumn
+            title="Done"
+            tasks={tasks.filter((task) => task.status === 2)}
+            deleteTask={handleDeleteTask}
+            updateTask={updateTask.mutate}
+            openForm={openEditTask}
+          />
         </div>
       </div>
 
@@ -215,22 +114,15 @@ const Board = () => {
         <TaskForm
           title="Add New Task"
           closeModal={closeModal}
-          handleFormSubmit={submitNewTask}
-          taskName={taskName}
-          setTaskName={setTaskName}
-          taskDescription={taskDescription}
-          setTaskDescription={setTaskDescription}
+          onSubmit={handleCreateTask}
         />
       )}
       {showEditTask && (
         <TaskForm
           title="Edit Task"
           closeModal={closeModal}
-          handleFormSubmit={submitEditTask}
-          taskName={taskName}
-          setTaskName={setTaskName}
-          taskDescription={taskDescription}
-          setTaskDescription={setTaskDescription}
+          onSubmit={handleUpdateTask}
+          initialData={editingTask}
         />
       )}
     </>
