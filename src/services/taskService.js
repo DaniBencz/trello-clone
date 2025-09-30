@@ -10,6 +10,7 @@ export const postTask = async (task) => {
 export const getTasks = () => {
   const tasks = localStorage.getItem("tasks");
 
+  // return Promise.reject(); // Simulate error to test Rollback strategy
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(tasks ? JSON.parse(tasks) : []);

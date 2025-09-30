@@ -9,9 +9,11 @@ import {
 } from "../../hooks/useTasks";
 import TaskForm from "./TaskForm";
 import BoardColumn from "./BoardColumn";
+import Spinner from "../common/Spinner";
+import ErrorState from "../common/ErrorState";
 
 const Board = () => {
-  const { data: tasks = [] } = useTasks();
+  const { data: tasks = [], isLoading, error, refetch } = useTasks();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -58,6 +60,20 @@ const Board = () => {
     await logout();
     navigate("/");
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <ErrorState
+        message="Failed to load tasks. Please try again."
+        onRetry={() => refetch()}
+        retryLabel="Retry"
+      />
+    );
+  }
 
   return (
     <>
