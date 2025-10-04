@@ -76,23 +76,22 @@ const Board = () => {
   }
 
   return (
-    <>
+    <div className="flex items-center justify-center min-h-screen">
       <div
         className={`p-6 bg-gray-400 w-[99vw] md:w-[80vw] md:max-w-6xl rounded-lg ${
           showAddTask || showEditTask ? "blur-sm" : ""
         }`}
       >
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Task Board</h1>
           <button
             onClick={openAddTask}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 cursor-pointer"
           >
             Add Task
           </button>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700"
+            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700 cursor-pointer"
           >
             Logout
           </button>
@@ -141,7 +140,7 @@ const Board = () => {
           initialData={editingTask}
         />
       )}
-    </>
+    </div>
   );
 };
 

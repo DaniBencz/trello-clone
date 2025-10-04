@@ -1,5 +1,12 @@
+import Header from "./Header";
+
 const AppLayout = ({ children }) => {
-  return <main>{children}</main>;
+  return (
+    <>
+      <Header />
+      <main>{children}</main>
+    </>
+  );
 };
 
 export default AppLayout;
