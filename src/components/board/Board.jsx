@@ -11,6 +11,7 @@ import TaskForm from "./TaskForm";
 import BoardColumn from "./BoardColumn";
 import Spinner from "../common/Spinner";
 import ErrorState from "../common/ErrorState";
+import Button from "../common/Button";
 
 const Board = () => {
   const { data: tasks = [], isLoading, error, refetch } = useTasks();
@@ -83,18 +84,19 @@ const Board = () => {
         }`}
       >
         <div className="flex justify-between items-center mb-6">
-          <button
+          <Button
             onClick={openAddTask}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 cursor-pointer"
+            className="rounded-md"
           >
             Add Task
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleLogout}
-            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-700 cursor-pointer"
+            variant="danger"
+            className="rounded-md"
           >
             Logout
-          </button>
+          </Button>
         </div>
 
         <div

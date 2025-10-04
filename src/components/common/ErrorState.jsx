@@ -1,3 +1,5 @@
+import Button from "./Button";
+
 const ErrorState = ({
   message = "Something went wrong. Please try again.",
   onRetry,
@@ -8,12 +10,9 @@ const ErrorState = ({
       <div className="text-center">
         <p className="text-red-600 mb-4">{message}</p>
         {onRetry && (
-          <button
-            onClick={onRetry}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 cursor-pointer"
-          >
+          <Button onClick={onRetry} className="rounded-md">
             {retryLabel}
-          </button>
+          </Button>
         )}
       </div>
     </div>

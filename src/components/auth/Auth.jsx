@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import Spinner from "../common/Spinner";
+import Button from "../common/Button";
 
 const Auth = () => {
   const [username, setUsername] = useState("");
@@ -86,12 +87,9 @@ const Auth = () => {
           </div>
 
           <div>
-            <button
-              type="submit"
-              className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 hover:cursor-pointer"
-            >
+            <Button type="submit" fullWidth className="rounded-md">
               Sign in
-            </button>
+            </Button>
           </div>
         </form>
       </div>
