@@ -1,70 +1,30 @@
-import { useContext, useState, useMemo, useCallback } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
-import {
-  useTasks,
-  useCreateTask,
-  useUpdateTask,
-  useDeleteTask,
-} from "../../hooks/useTasks";
-import { TASK_STATUS, createNewTask } from "../../constants/taskConstants";
+import useTaskBoard from "../../hooks/useTaskBoard";
 import TaskForm from "./TaskForm";
+import BoardHeader from "./BoardHeader";
 import BoardColumn from "./BoardColumn";
 import Spinner from "../common/Spinner";
 import ErrorState from "../common/ErrorState";
-import Button from "../common/Button";
 
 const Board = () => {
-  const { data: tasks = [], isLoading, error, refetch } = useTasks();
-  const createTask = useCreateTask();
-  const updateTask = useUpdateTask();
-  const deleteTask = useDeleteTask();
-
-  const [showAddTask, setShowAddTask] = useState(false);
-  const [showEditTask, setShowEditTask] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
-
-  const columns = useMemo(() => [
-    {
-      title: "To Do",
-      tasks: tasks.filter(task => task.status === TASK_STATUS.TODO)
-    },
-    {
-      title: "In Progress", 
-      tasks: tasks.filter(task => task.status === TASK_STATUS.IN_PROGRESS)
-    },
-    {
-      title: "Done",
-      tasks: tasks.filter(task => task.status === TASK_STATUS.DONE)
-    }
-  ], [tasks]);
-
-  const openAddTask = () => setShowAddTask(true);
-
-  const openEditTask = (task) => {
-    setEditingTask(task);
-    setShowEditTask(true);
-  };
-
-  const closeModal = () => {
-    setShowAddTask(false);
-    setShowEditTask(false);
-    setEditingTask(null);
-  };
-
-  const handleCreateTask = (taskData) => {
-    createTask.mutate(createNewTask(taskData.name, taskData.description));
-    closeModal();
-  };
-
-  const handleUpdateTask = (taskData) => {
-    updateTask.mutate({ ...editingTask, ...taskData });
-    closeModal();
-  };
-
-  const handleDeleteTask = useCallback((id) => {
-    deleteTask.mutate(id);
-  }, [deleteTask]);
+  const {
+    isLoading,
+    error,
+    refetch,
+    columns,
+    showAddTask,
+    showEditTask,
+    editingTask,
+    openAddTask,
+    openEditTask,
+    closeModal,
+    handleCreateTask,
+    handleUpdateTask,
+    handleDeleteTask,
+    updateTaskMutation
+  } = useTaskBoard();
 
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
@@ -95,21 +55,7 @@ const Board = () => {
           showAddTask || showEditTask ? "blur-sm" : ""
         }`}
       >
-        <div className="flex justify-between items-center mb-6">
-          <Button
-            onClick={openAddTask}
-            className="rounded-md"
-          >
-            Add Task
-          </Button>
-          <Button
-            onClick={handleLogout}
-            variant="danger"
-            className="rounded-md"
-          >
-            Logout
-          </Button>
-        </div>
+        <BoardHeader onAddTask={openAddTask} onLogout={handleLogout} />
 
         <div
           className="flex gap-4 md:gap-4 md:overflow-visible overflow-x-auto flex-nowrap snap-x snap-mandatory pb-4 -mx-4 px-4 scroll-smooth"
@@ -121,7 +67,7 @@ const Board = () => {
               title={column.title}
               tasks={column.tasks}
               deleteTask={handleDeleteTask}
-              updateTask={updateTask.mutate}
+              updateTask={updateTaskMutation.mutate}
               openForm={openEditTask}
             />
           ))}
