@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
 import {
@@ -24,6 +24,21 @@ const Board = () => {
   const [showEditTask, setShowEditTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  const columns = useMemo(() => [
+    {
+      title: "To Do",
+      tasks: tasks.filter(task => task.status === TASK_STATUS.TODO)
+    },
+    {
+      title: "In Progress", 
+      tasks: tasks.filter(task => task.status === TASK_STATUS.IN_PROGRESS)
+    },
+    {
+      title: "Done",
+      tasks: tasks.filter(task => task.status === TASK_STATUS.DONE)
+    }
+  ], [tasks]);
+
   const openAddTask = () => setShowAddTask(true);
 
   const openEditTask = (task) => {
@@ -47,9 +62,9 @@ const Board = () => {
     closeModal();
   };
 
-  const handleDeleteTask = (id) => {
+  const handleDeleteTask = useCallback((id) => {
     deleteTask.mutate(id);
-  };
+  }, [deleteTask]);
 
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
@@ -100,27 +115,16 @@ const Board = () => {
           className="flex gap-4 md:gap-4 md:overflow-visible overflow-x-auto flex-nowrap snap-x snap-mandatory pb-4 -mx-4 px-4 scroll-smooth"
           aria-label="Task board columns"
         >
-          <BoardColumn
-            title="To Do"
-            tasks={tasks.filter((task) => task.status === TASK_STATUS.TODO)}
-            deleteTask={handleDeleteTask}
-            updateTask={updateTask.mutate}
-            openForm={openEditTask}
-          />
-          <BoardColumn
-            title="In Progress"
-            tasks={tasks.filter((task) => task.status === TASK_STATUS.IN_PROGRESS)}
-            deleteTask={handleDeleteTask}
-            updateTask={updateTask.mutate}
-            openForm={openEditTask}
-          />
-          <BoardColumn
-            title="Done"
-            tasks={tasks.filter((task) => task.status === TASK_STATUS.DONE)}
-            deleteTask={handleDeleteTask}
-            updateTask={updateTask.mutate}
-            openForm={openEditTask}
-          />
+          {columns.map((column) => (
+            <BoardColumn
+              key={column.title}
+              title={column.title}
+              tasks={column.tasks}
+              deleteTask={handleDeleteTask}
+              updateTask={updateTask.mutate}
+              openForm={openEditTask}
+            />
+          ))}
         </div>
       </div>
 
