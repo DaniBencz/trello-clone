@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Board from "./components/board/Board";
 import AppLayout from "./components/layout/Layout";
 import { AuthProvider } from "./components/auth/AuthProvider";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 function App() {
   return (
@@ -15,7 +16,9 @@ function App() {
             path="/board"
             element={
               <ProtectedRoute>
-                <Board />
+                <ErrorBoundary>
+                  <Board />
+                </ErrorBoundary>
               </ProtectedRoute>
             }
           />
