@@ -7,6 +7,7 @@ import {
   useUpdateTask,
   useDeleteTask,
 } from "../../hooks/useTasks";
+import { TASK_STATUS, createNewTask } from "../../constants/taskConstants";
 import TaskForm from "./TaskForm";
 import BoardColumn from "./BoardColumn";
 import Spinner from "../common/Spinner";
@@ -37,11 +38,7 @@ const Board = () => {
   };
 
   const handleCreateTask = (taskData) => {
-    createTask.mutate({
-      ...taskData,
-      id: Date.now(),
-      status: 0,
-    });
+    createTask.mutate(createNewTask(taskData.name, taskData.description));
     closeModal();
   };
 
@@ -105,21 +102,21 @@ const Board = () => {
         >
           <BoardColumn
             title="To Do"
-            tasks={tasks.filter((task) => task.status === 0)}
+            tasks={tasks.filter((task) => task.status === TASK_STATUS.TODO)}
             deleteTask={handleDeleteTask}
             updateTask={updateTask.mutate}
             openForm={openEditTask}
           />
           <BoardColumn
             title="In Progress"
-            tasks={tasks.filter((task) => task.status === 1)}
+            tasks={tasks.filter((task) => task.status === TASK_STATUS.IN_PROGRESS)}
             deleteTask={handleDeleteTask}
             updateTask={updateTask.mutate}
             openForm={openEditTask}
           />
           <BoardColumn
             title="Done"
-            tasks={tasks.filter((task) => task.status === 2)}
+            tasks={tasks.filter((task) => task.status === TASK_STATUS.DONE)}
             deleteTask={handleDeleteTask}
             updateTask={updateTask.mutate}
             openForm={openEditTask}

@@ -16,8 +16,9 @@ const TaskForm = ({ title, closeModal, onSubmit, initialData = {} }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (name.trim()) {
-      onSubmit({ name, description });
+      onSubmit({ name: name.trim(), description: description.trim() });
     }
   };
 
@@ -27,33 +28,26 @@ const TaskForm = ({ title, closeModal, onSubmit, initialData = {} }) => {
         <h2 className="text-xl font-bold mb-4">{title}</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
-            type="text"
             placeholder="Task Name"
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
+            autoFocus
             required
           />
           <input
-            type="text"
             placeholder="Task Description"
+            type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-blue-100"
           />
           <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              onClick={closeModal}
-              variant="secondary"
-            >
+            <Button type="button" onClick={closeModal} variant="secondary">
               Cancel
             </Button>
-            <Button
-              type="submit"
-            >
-              Save
-            </Button>
+            <Button type="submit">Save</Button>
           </div>
         </form>
       </div>
